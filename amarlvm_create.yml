@@ -1,0 +1,36 @@
+---
+- hosts: lb
+  user: root
+  tasks:
+  - name: Create LVM physical volume
+    command: pvcreate /dev/sdb1
+
+  - name: vgcreate
+    lvg:
+      vg: vgdata
+      pvs: /dev/sdb1
+
+  - name: lvcreate
+    lvol:
+      vg: vgdata 
+      lv: datatwo
+      size: 1500M
+
+  - name: create filesystem
+    filesystem:
+      fstype: ext4
+      dev: /dev/vgdata/datatwo
+ 
+  - name: create filesystem
+    file: path=/tmp/lvdata1 state=directory
+
+  - name: mount lvm
+    mount:
+      name: /tmp/lvdata1
+      src: /dev/vgdata/datatwo 
+      fstype: ext4
+      state: mounted
+
+
+
+
